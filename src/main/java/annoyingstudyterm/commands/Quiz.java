@@ -9,9 +9,9 @@ import annoyingstudyterm.question.QuestionRepository;
 
 class Quiz extends Command {
     @Override
-    protected void Execute(String[] args) {
-        QuestionList list = QuestionRepository.loadFromFile();
-        if (list == null) {
+    protected void onCommand(String[] args) {
+        QuestionList list = new QuestionList(QuestionRepository.getAll());
+        if (list.length() == 0) {
             System.out.println("Unable to start quiz. Failed to get questionList.");
             return;
         }
@@ -20,7 +20,10 @@ class Quiz extends Command {
         }
         handleQuiz(list);
     }
-
+    @Override
+    protected void onNextCommand(String[] args) {
+        this.onCommand(args);
+    }
     private void handleNoQuestionsFound() {
         System.out.println("[WARNING] No questions were found in the register, unable to start quiz. You can insert question with \"add\" command.");
         String input;

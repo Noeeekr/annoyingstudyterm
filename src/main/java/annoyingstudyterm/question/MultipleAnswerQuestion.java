@@ -4,11 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
+@JsonAutoDetect(
+    getterVisibility = Visibility.NONE
+)
 public class MultipleAnswerQuestion extends Question {
+    @JsonProperty("alternatives")
     public List<String> alternatives;
+    @JsonProperty("correctAlternatives")
     public int correctAlternativeIndex;
 
     @JsonCreator
@@ -24,7 +31,7 @@ public class MultipleAnswerQuestion extends Question {
     }
 
     public MultipleAnswerQuestion() {
-        super();
+        super(Question.QuestionDisplayFormat.MULTIPLE_ANSWER);
         this.alternatives = this.promptQuestionAlternatives();
         this.correctAlternativeIndex = this.promptCorrectAlternativeIndex();
     }
@@ -67,7 +74,7 @@ public class MultipleAnswerQuestion extends Question {
     public boolean execute() {
         System.out.println("Answers:");
         for (var i = 0; i < this.alternatives.size(); i++) {
-            System.out.printf("[%dª] %s\n",i + 1,this.alternatives.get(i));
+            System.out.printf("    [%dª] %s\n",i + 1,this.alternatives.get(i));
         }
         Question.lockPrompt();
         System.out.print("What's the number of the correct answer? ");
@@ -80,5 +87,10 @@ public class MultipleAnswerQuestion extends Question {
         }
         System.out.println("Wrong answer!! :(");
         return false;
+    }
+
+    @Override
+    public String getAnswer() {
+        return this.alternatives.get(this.correctAlternativeIndex);
     }
 }

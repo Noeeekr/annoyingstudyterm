@@ -13,6 +13,28 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 public class QuestionRepository {
     private static List<Question> list;
+    public static int length = 0;
+    static {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            byte[] fileContent = Files.readAllBytes(Paths.get(ClientConfiguration.getConfiguration().questionsFilePath));
+            QuestionRepository.list = mapper.readValue(fileContent, new TypeReference<List<Question>>(){});
+            QuestionRepository.length = QuestionRepository.list.size();
+        } catch(Exception e) {
+            System.out.println("[ERROR] Failed to load user's question file." + e.getMessage());
+            handleQuestionFileNotFound();
+            QuestionRepository.list = new ArrayList<Question>();
+        }
+    }
+    public static Question at(int index) {
+        if (index > QuestionRepository.list.size() - 1) {
+            return null;
+        }
+        return list.get(index);
+    }
+    public static List<Question> getAll() {
+        return List.copyOf(QuestionRepository.list);
+    }
     public static void add(Question question) {
         if (question == null) {
             return;
@@ -21,18 +43,6 @@ public class QuestionRepository {
         QuestionRepository.save();
         return;
     }
-    public static QuestionList loadFromFile() {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            byte[] fileContent = Files.readAllBytes(Paths.get(ClientConfiguration.getConfiguration().questionsFilePath));
-            QuestionRepository.list = mapper.readValue(fileContent, new TypeReference<List<Question>>(){});
-            return new QuestionList(QuestionRepository.list);
-        } catch(Exception e) {
-            System.out.println("[ERROR] Failed to load user's question file." + e.getMessage());
-            handleQuestionFileNotFound();
-            return new QuestionList(new ArrayList<Question>());
-        }
-    };
     private static void handleQuestionFileNotFound() {
         System.out.println("[WARNING] Failed to find user's question file. You can change the directory for the question file using the \"configuration\" command.");
         System.out.print("[WARNING] A question file is necessary to continue, do you wish to create a new empty one for this user? (y/n): ");
@@ -75,5 +85,11 @@ public class QuestionRepository {
             return false;
         }
         return true;
+    }
+    public static boolean remove(int index) {
+        if (QuestionRepository.list.remove(index) == null) {
+            return false;
+        }
+        return QuestionRepository.save();
     }
 }

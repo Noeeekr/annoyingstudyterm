@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -16,16 +19,23 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonSubTypes(
     @JsonSubTypes.Type(value = MultipleAnswerQuestion.class, name = "MULTIPLE_ANSWER")
 )
+@JsonAutoDetect(
+    fieldVisibility = Visibility.NONE
+)
 public abstract class Question {
     public static enum QuestionDisplayFormat {
         MULTIPLE_ANSWER
     }
 
-    public String subject;
-    public String description;
-    public QuestionDisplayFormat displayFormat;
+    @JsonProperty("subject")
+        public String subject;
+    @JsonProperty("description")
+        public String description;
+    @JsonProperty("displayFormat")
+        public QuestionDisplayFormat displayFormat;
 
-    public Question() {
+    public Question(QuestionDisplayFormat displayFormat) {
+        this.displayFormat = displayFormat;
         this.subject = Question.promptSubject();
         this.description = Question.promptDescription();
     }
@@ -114,4 +124,5 @@ public abstract class Question {
     }
     // Executes the questions interactive resolution prompt. Returns a boolean indicating if the user got it right or not
     public abstract boolean execute();
+    public abstract String getAnswer();
 }

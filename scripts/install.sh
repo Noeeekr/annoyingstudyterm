@@ -17,6 +17,12 @@ mkdir -p /usr/local/lib/annoyingstudyterm
 chmod 755 "${PWD}/annoyingstudyterm.sh"
     cp "${PWD}/annoyingstudyterm.sh" "/usr/local/bin/annoyingstudyterm"
 
-echo "annoyingstudyterm quiz" >> ${HOME}/.profile
+LINEPOS="$(cat ~/.profile | grep -n "annoyingstudyterm quiz")"
+LINE="$(echo $LINEPOS | cut -d ":" -f 1)"
+if [ "$LINE" ==  "" ]; then
+    echo "annoyingstudyterm quiz" >> ${HOME}/.profile
+else
+    echo "[WARNING] Start command already found in "${HOME}/.profile" skipping this part."
+fi
 sudo -u "$USER" mkdir -p ${HOME}/.local/annoyingstudyterm
 sudo -u "$USER" mkdir -p ${HOME}/.config/annoyingstudyterm
