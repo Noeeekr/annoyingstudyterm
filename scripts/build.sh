@@ -42,7 +42,7 @@ if [ -e $BUILD_DIR ]; then
 fi
 
 sudo -u $USER mvn clean package
-mkdir $BUILD_DIR
-cp "${SCRIPTS_DIR}/install.sh" "${BUILD_DIR}/install.sh"
-cp "${SCRIPTS_DIR}/annoyingstudyterm.sh" "${BUILD_DIR}/annoyingstudyterm.sh"
-cp "${ROOT_DIR}/target/annoyingstudyterm.jar" "${BUILD_DIR}/annoyingstudyterm.jar"
+sudo -u $USER mkdir $BUILD_DIR
+sudo -u $USER cp "${SCRIPTS_DIR}/install.sh" "${BUILD_DIR}/install.sh"
+sudo -u $USER cp "${SCRIPTS_DIR}/annoyingstudyterm.sh" "${BUILD_DIR}/annoyingstudyterm.sh"
+sudo -u $USER cp "${ROOT_DIR}/target/annoyingstudyterm.jar" "${BUILD_DIR}/annoyingstudyterm.jar"

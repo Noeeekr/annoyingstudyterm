@@ -2,6 +2,16 @@
 HOME="$(getent passwd "${SUDO_USER:-}" | cut -d: -f6)"
 USER="$(getent passwd "${SUDO_USER:-}" | cut -d: -f1)"
 
+installRunnableScript() {
+    LINEPOS="$(cat $1 | grep -n "annoyingstudyterm quiz")"
+    LINE="$(echo $LINEPOS | cut -d ":" -f 1)"
+    if [ "$LINE" ==  "" ]; then
+        echo "annoyingstudyterm quiz" >> $1
+    else
+        echo "[WARNING] Start command already found in $1. Skipping this step."
+    fi
+}
+
 if [ "$EUID" -ne 0 ]; then
     echo "Please run the installation script in using \"sudo\""
     exit 1
@@ -17,12 +27,8 @@ mkdir -p /usr/local/lib/annoyingstudyterm
 chmod 755 "${PWD}/annoyingstudyterm.sh"
     cp "${PWD}/annoyingstudyterm.sh" "/usr/local/bin/annoyingstudyterm"
 
-LINEPOS="$(cat ~/.profile | grep -n "annoyingstudyterm quiz")"
-LINE="$(echo $LINEPOS | cut -d ":" -f 1)"
-if [ "$LINE" ==  "" ]; then
-    echo "annoyingstudyterm quiz" >> ${HOME}/.profile
-else
-    echo "[WARNING] Start command already found in "${HOME}/.profile" skipping this part."
-fi
+installRunnableScript ${HOME}/.profile
+installRunnableScript ${HOME}/.bashrc
+
 sudo -u "$USER" mkdir -p ${HOME}/.local/annoyingstudyterm
 sudo -u "$USER" mkdir -p ${HOME}/.config/annoyingstudyterm
