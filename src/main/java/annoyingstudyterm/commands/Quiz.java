@@ -1,8 +1,10 @@
 package annoyingstudyterm.commands;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
+import annoyingstudyterm.configuration.ClientConfiguration;
 import annoyingstudyterm.question.Question;
 import annoyingstudyterm.question.QuestionList;
 import annoyingstudyterm.question.QuestionRepository;
@@ -10,21 +12,25 @@ import annoyingstudyterm.question.QuestionRepository;
 class Quiz extends Command {
     @Override
     protected void onCommand(String[] args) {
-        QuestionList list = new QuestionList(QuestionRepository.getAll());
-        if (list.length() == 0) {
-            System.out.println("Unable to start quiz. Failed to get questionList.");
-            return;
+        LocalDate lastCompletionTime = ClientConfiguration.getConfiguration().lastCompletionTime;
+        if (lastCompletionTime.plusDays(1).isAfter(LocalDate.now())) {
+            if (args.length == 0 || !args[0].equals("--force")) {
+                System.out.println("[WARNING] You have already completed a quiz in the last 24 hours. Good job! If you want to do it again please use the --force flag.");
+                return;
+            }
         }
+        QuestionList list = new QuestionList(QuestionRepository.getAll());
         if (list.length() == 0) {
             handleNoQuestionsFound();
         }
         handleQuiz(list);
+        ClientConfiguration.updateLastCompletionTime();
     }
     @Override
     protected void onNextCommand(String[] args) {
         this.onCommand(args);
     }
-    private void handleNoQuestionsFound() {
+    private static void handleNoQuestionsFound() {
         System.out.println("[WARNING] No questions were found in the register, unable to start quiz. You can insert question with \"add\" command.");
         String input;
         do {
@@ -38,7 +44,7 @@ class Quiz extends Command {
         } while(input.charAt(0) == 'y');
     }
 
-    private void handleQuiz(QuestionList list) {
+    private static void handleQuiz(QuestionList list) {
         List<Question> questions = list.getRandomN(10);
         System.out.println("");
         System.out.println("");

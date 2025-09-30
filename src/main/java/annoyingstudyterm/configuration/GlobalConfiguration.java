@@ -1,5 +1,6 @@
 package annoyingstudyterm.configuration;
 
+
 public class GlobalConfiguration {
     // Might come from a designed file that is run at build time to parse these values from a single instance of truth
     public static final String applicationName = "annoyingstudyterm";
